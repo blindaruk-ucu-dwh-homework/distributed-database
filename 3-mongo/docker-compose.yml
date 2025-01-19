@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017" # Пробрасываем порт MongoDB на хост
+    volumes:
+      - mongo-data:/data/db # Храним данные на хосте для их сохранения после остановки контейнера
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root # Указываем пользователя
+      MONGO_INITDB_ROOT_PASSWORD: example # Указываем пароль
+
+volumes:
+  mongo-data:
+    driver: local
