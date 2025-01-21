@@ -357,3 +357,83 @@ WHERE customer_name = 'John Doe' AND item_ids CONTAINS 6f2fac65-cb69-44e3-9661-8
 це додати в ключ не можна, оскільки тип не підходе, тому індекс
 
 ![img.png](img/orders/3-img.png)
+
+### 4. Для замовника знайдіть замовлення за певний період часу і їх кількість
+
+```
+SELECT COUNT(*)
+FROM my_keyspace.orders_by_order_date
+WHERE customer_name = 'John Doe'
+  AND order_date >= '2025-01-01'
+  AND order_date <= '2025-01-31';
+```
+![img.png](img/orders/4-img.png)
+
+### 5. Для кожного замовників визначте суму на яку були зроблені усі його замовлення
+```
+
+SELECT customer_name, SUM(total_price) AS total_spent
+FROM my_keyspace.orders
+GROUP BY customer_name;
+```
+
+![img.png](img/orders/5-img.png)
+
+### 6. Для кожного замовників визначте замовлення з максимальною вартістю
+
+```
+SELECT customer_name, MAX(total_price) AS max_price
+FROM orders
+GROUP BY customer_name;
+```
+
+![img.png](img/orders/6-img.png)
+
+### 7. Модифікуйте певне замовлення додавши / видаливши один або кілька товарів при цьому також змінюючи вартість замовлення
+
+```
+UPDATE orders
+SET item_ids = item_ids + [eb7c9a19-0968-41de-91f9-ede7cca5ee80], total_price = 600
+WHERE customer_name = 'John Doe' AND order_id = 0fec2c78-0a0c-4421-a02a-08d20d8d85c4;
+```
+
+### 8. Для кожного замовлення виведіть час коли його ціна були занесена в базу (SELECT WRITETIME)
+
+```
+SELECT customer_name, order_id, WRITETIME(total_price) AS write_time
+FROM orders;
+```
+
+![img.png](img/orders/8-img.png)
+
+### 9. Створіть замовлення з певним часом життя (TTL), після якого воно видалиться
+
+```
+INSERT INTO orders (customer_name, order_id, item_ids, total_price, order_date)
+VALUES ('John Doe', uuid(), [123e4567-e89b-12d3-a456-426614174000], 500, toTimestamp(now()))
+    USING TTL 86400;
+
+```
+
+### 10. Поверніть замовлення у форматі JSO
+
+```
+SELECT JSON *
+FROM orders
+WHERE customer_name = 'John Doe' AND order_id = 8594f87f-9a9f-4685-845a-39ae04a5fd86;
+```
+
+![img.png](img/orders/10-img.png)
+
+### 11. Додайте замовлення у форматі JSON
+
+```
+INSERT INTO orders JSON '{
+  "customer_name": "John Doe",
+  "order_id": "123e4567-e89b-12d3-a456-426614174000",
+  "item_ids": ["123e4567-e89b-12d3-a456-426614174111", "123e4567-e89b-12d3-a456-426614174222"],
+  "total_price": 500.0,
+  "order_date": "2025-01-20T10:00:00.000Z"
+}';
+```
+
