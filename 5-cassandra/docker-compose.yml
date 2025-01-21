@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+  cassandra:
+    image: cassandra:4.1
+    container_name: cassandra-node
+    ports:
+      - "9042:9042"
+    environment:
+      - CASSANDRA_CLUSTER_NAME=TestCluster
+      - CASSANDRA_NUM_TOKENS=256
+      - CASSANDRA_SEEDS=cassandra
+      - CASSANDRA_START_RPC=true
+      - CASSANDRA_AUTHENTICATOR=PasswordAuthenticator
+      - CASSANDRA_USER=admin
+      - CASSANDRA_PASSWORD=admin123
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+      - ${PWD}/docker-files/cassandra.yaml:/etc/cassandra/cassandra.yaml
+
+volumes:
+  cassandra_data:
